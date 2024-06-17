@@ -21,7 +21,7 @@ public class MainServlet extends HttpServlet {
     }
 
     @Override
-    protected synchronized void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("text/html,charset=UTF-8");
         var path = req.getRequestURI();
         if (path.matches("/api/posts/\\d+")) {
@@ -36,19 +36,19 @@ public class MainServlet extends HttpServlet {
     }
 
     @Override
-    protected synchronized void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html,charset=UTF-8");
-        resp.getWriter().println("Был обработан Post-запрос и в коллекцию был добавлен новый пост \n");
+        resp.getWriter().println("Был обработан Post-запрос \n");
         controller.save(req.getReader(), resp);
     }
 
     @Override
-    protected synchronized void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         resp.setContentType("text/html,charset=UTF-8");
         var path = req.getRequestURI();
         resp.getWriter().println("<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\">");
         final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
-        resp.getWriter().println("Был обработан Delete-запрос и из коллекции был удалён пост под id = " + id + " \n");
+        resp.getWriter().println("Был обработан Delete-запрос \n");
         controller.removeById(id, resp);
     }
     /*

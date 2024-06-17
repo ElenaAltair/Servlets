@@ -3,35 +3,34 @@ package ru.netology.repository;
 import ru.netology.model.Post;
 
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 
 
 // Stub
 public class PostRepository {
 
-    private static List<Post> posts = new CopyOnWriteArrayList<>();
-    private static Long index = 10L;
+    private final static Map<Long, Post> posts = new ConcurrentHashMap<>();
+    private static AtomicLong index = new AtomicLong(10L);
+
 
     public PostRepository() {
-        posts.add(new Post(1, "post 1"));
-        posts.add(new Post(2, "post 2"));
-        posts.add(new Post(3, "post 3"));
-        posts.add(new Post(4, "post 4"));
-        posts.add(new Post(5, "post 5"));
+        posts.put(1L, new Post(1, "post 1"));
+        posts.put(2L, new Post(2, "post 2"));
+        posts.put(3L, new Post(3, "post 3"));
+        posts.put(4L, new Post(4, "post 4"));
+        posts.put(5L, new Post(5, "post 5"));
     }
 
-    public List<Post> all() {
+    public Map<Long, Post> all() {
 
         return posts; //Collections.emptyList();
     }
 
     public Post getById(long id) {
-        for (Post post : posts) {
-            if (post.getId() == id) {
-                return post;
-            }
-        }
-        return null;
+        return posts.get(id);
     }
 
     /*
@@ -45,25 +44,23 @@ public class PostRepository {
      */
     public Post save(Post post) {
         if (post.getId() == 0) {
-            post.setId(index + 1);
-            posts.add(post);
+            post.setId(index.getAndIncrement());
+            posts.put(post.getId(), post);
         } else {
             int help = 0;
-            for (Post postF : posts) {
-                if (postF.getId() == post.getId()) {
-                    help = 1;
-                    postF.setContent(post.getContent());
-                }
+            if (posts.containsKey(post.getId())) {
+                help = 1;
+                posts.put(post.getId(), post);
             }
             if (help == 0) {
-                post.setId(index + 1);
-                posts.add(post);
+                post.setId(index.getAndIncrement());
+                posts.put(post.getId(), post);
             }
         }
         return post;
     }
 
     public void removeById(long id) {
-        posts.removeIf(post -> post.getId() == id);
+        posts.remove(id);
     }
 }
